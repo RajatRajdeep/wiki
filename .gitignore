@@ -1,0 +1,7 @@
+# Ignore all hidden file except gitignore
+*.
+!.gitignore
+# Ignore all hidden folders
+/.*
+__pycache__
+db.sqlite3
