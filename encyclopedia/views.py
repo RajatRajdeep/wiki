@@ -1,6 +1,8 @@
+from django.http.response import HttpResponseRedirect
 from . import util
 
 from django.shortcuts import render
+from django.urls import reverse
 
 from markdown2 import markdown
 
@@ -26,9 +28,24 @@ def encyclopedia(request, title):
         return render(request, "encyclopedia/encyclopedia.html", context)
 
     context = {
-            "title": "Encyclopedia Not Found",
-            "error": f"Encyclopedia of {title} is not present.\
-                 Please feel free to add.",
-            "random_entry": util.get_random_entry()
+        "title": "Encyclopedia Not Found",
+        "error": f"Encyclopedia of {title} is not present.\
+            Please feel free to add.",
+        "random_entry": util.get_random_entry()
         }
     return render(request, "encyclopedia/error.html", context)
+
+
+def search(request):
+    encyclopedia = request.GET['encyclopedia']
+    if util.get_entry(encyclopedia):
+        return HttpResponseRedirect(
+            reverse('encyclopedia:encyclopedia', args=[encyclopedia]))
+
+    results = ([entry for entry in util.list_entries()
+                if encyclopedia.lower() in entry.lower()])
+    context = {
+        "entries": results,
+        "random_entry": util.get_random_entry()
+    }
+    return render(request, "encyclopedia/results.html", context)
